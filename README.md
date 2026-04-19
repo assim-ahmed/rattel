@@ -1,16 +1,40 @@
-# React + Vite
+# 📖 منصة القرآن الكريم (Quran Listening Platform)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+منصة حديثة للاستماع إلى القرآن الكريم، تتيح للمستخدمين اختيار القرّاء، تصفح السور، والاستماع بجودة عالية مع تجربة استخدام بسيطة ومريحة.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+# 🎯 فكرة المشروع
 
-## React Compiler
+مشروع Frontend يهدف إلى بناء واجهة تفاعلية لمنصة قرآن كريم، تعتمد على:
+- عرض قائمة القرّاء
+- عرض سور كل قارئ
+- تشغيل الصوت مباشرة
+- البحث عن القرّاء
+- إضافة سور إلى المفضلة
+- دعم الوضع الليلي (Dark Mode)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+# 🚀 المميزات
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- 🎧 تشغيل سور القرآن بصوت القرّاء
+- 🔍 البحث عن قارئ بسهولة
+- ⭐ إضافة السور إلى المفضلة
+- 🌙 وضع ليلي (Dark Mode)
+- 📱 تصميم متجاوب (Responsive)
+- ⚡ واجهة سريعة وسهلة الاستخدام
+
+---
+
+# 🧱 التقنيات المستخدمة
+
+- React.js
+- Tailwind CSS
+- JavaScript (ES6+)
+- API خارجية للقرآن الكريم
+- Zustand (إدارة الحالة - اختياري)
+
+---
+
+# 📂 هيكل المشروع
