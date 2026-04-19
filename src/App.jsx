@@ -1,17 +1,50 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useEffect } from 'react';
+import { useThemeStore } from './store/useThemeStore';
+import { useLoaderStore } from './store/useLoaderStore'; // استيراد مخزن اللودر
+import { Routes , Route } from 'react-router-dom';
+import Loader from './components/Loader';
+import Navbar from './components/Navbar';
+import Hero from './components/Hero';
+import Home from './page/Home';
+import Moshaf from './page/Moshaf';
+import AudioPlayer from './components/AudioPlayer';
+
+
 
 function App() {
-  const [count, setCount] = useState(0)
+  const { theme, applyTheme } = useThemeStore();
+  // جلب الحالة والدالة من Zustand
+  const { hasLoaded, setHasLoaded } = useLoaderStore();
+
+  // تطبيق الثيم عند التغيير
+  useEffect(() => {
+    applyTheme(theme);
+  }, [theme, applyTheme]);
 
   return (
-    <>
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-activity-icon lucide-activity"><path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"/></svg>
-    </>
-  )
+    <div className="min-h-screen bg-white dark:bg-slate-950 transition-colors duration-500 overflow-x-hidden">
+      
+      {/* 1. اللودر: يظهر فقط إذا لم يسبق تحميله في هذه الجلسة */}
+      {!hasLoaded && (
+        <Loader onFinished={() => setHasLoaded()} />
+      )}
+
+      {/* 2. المحتوى الأساسي: يظهر بناءً على حالة hasLoaded */}
+      <main className={`transition-opacity duration-1000 ${!hasLoaded ? 'opacity-0' : 'opacity-100'}`}>
+        
+        <Navbar />
+        <Hero/>
+
+        <Routes>
+          <Route path='/' element={<Home/>} />
+          <Route path='/quran' element={<Moshaf/>} />
+        </Routes>
+        <AudioPlayer/>
+
+        
+      </main>
+    </div>
+  );
 }
 
-export default App
+export default App;
