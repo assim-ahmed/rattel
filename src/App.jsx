@@ -8,6 +8,12 @@ import Hero from './components/Hero';
 import Home from './page/Home';
 import Moshaf from './page/Moshaf';
 import AudioPlayer from './components/AudioPlayer';
+import Favorites from './page/Favorites';
+import About from './page/About';
+import Radio from './page/Radio';
+
+
+
 
 
 
@@ -38,6 +44,9 @@ function App() {
         <Routes>
           <Route path='/' element={<Home/>} />
           <Route path='/quran' element={<Moshaf/>} />
+          <Route path='/Favorites' element={<Favorites/>} />
+          <Route path='/about' element={<About/>} />
+          <Route path='/radio' element={<Radio/>} />
         </Routes>
         <AudioPlayer/>
 

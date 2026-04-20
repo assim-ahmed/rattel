@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React,{useState,useEffect} from 'react';
 
 const Loader = ({ onFinished }) => {
   const [progress, setProgress] = useState(0);
@@ -15,12 +15,11 @@ const Loader = ({ onFinished }) => {
           }, 600);
           return 100;
         }
-        return prev + 2; // سرعة التحميل
+        return prev+2; // سرعة التحميل
       });
     }, 40);
-
     return () => clearInterval(timer);
-  }, [onFinished]);
+  },[onFinished]);
 
   return (
     <div 
@@ -30,11 +29,9 @@ const Loader = ({ onFinished }) => {
         ${isExiting ? '-translate-y-full' : 'translate-y-0'}`}
     >
       <div className="w-full max-w-md">
-
         <div className='flex justify-center items-center'>
-            <img src="./public/favicon.png" className='size-70 rounded-full' alt="" />
+            <img src="public/favicon.png" className='size-70 rounded-full' alt="" />
         </div>
-        
         {/* النصوص: تتأثر بالـ Dark Mode عبر كلاسات dark: */}
         <div className="flex justify-between items-end mb-6">
           <div className="space-y-1">

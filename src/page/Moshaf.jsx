@@ -6,15 +6,16 @@ import usePlayerStore from '../store/usePlayerStore';
 
 function Moshaf() {
   const [searchParams] = useSearchParams();
-  const reciterId = searchParams.get('id') || Math.ceil((Math.random() *100) + 1 ) ;
+  const reciterId = searchParams.get('id') || 102;
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(true); // حالة التحميل
   const {data,loading,error} = useFetch('https://www.mp3quran.net/api/v3/suwar?language=ar');
   const {reciter} = useFetchById(reciterId);
   const playTrack = usePlayerStore((state) => state.playTrack);
-
-
   const surahs = data?.suwar || [];
+
+  console.log(reciterId);
+  
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -22,7 +23,6 @@ function Moshaf() {
     }, 1000); 
     return () => clearTimeout(timer);
   }, []);
-
 
 
   const filteredSurahs = surahs.filter(surah =>
@@ -54,7 +54,7 @@ function Moshaf() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
           <div>
             <h1 className="text-3xl font-black text-slate-800 dark:text-slate-100">
-              مصحف الشيخ رقم: <span className="text-emerald-600 dark:text-emerald-400">#{reciter?.name}</span>
+              مصحف الشيخ : <span className="text-emerald-600 dark:text-emerald-400">{reciter?.name}</span>
             </h1>
             <p className="text-slate-500 dark:text-slate-400 mt-2">عرض سور القرآن الكريم المتاحة للشيخ</p>
           </div>
@@ -90,6 +90,7 @@ function Moshaf() {
                     baseName = `${surah.id}.mp3`
                 }
                 let fileName =pathName+baseName;
+
                 return <div 
                 onClick={()=>{playTrack(fileName,surah.name,reciter?.name)}}
                 key={surah.id}
@@ -108,7 +109,6 @@ function Moshaf() {
                       <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400">
                         {surah.makkia?'مكية':'مدنية'}
                       </span>
-                   
                     </div>
                   </div>
 

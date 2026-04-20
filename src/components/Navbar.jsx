@@ -26,6 +26,8 @@ const Navbar = () => {
         { name: 'المصحف', icon: (color) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 7v14" /><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z" /></svg>, path: '/quran' },
 
         { name: 'المفضلة', icon: (color) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m14.876 18.99-1.368 1.323a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5a5.2 5.2 0 0 1-.244 1.572" /><path d="M15 15h6" /></svg>, path: '/favorites' },
+
+        { name: 'راديو', icon: (color) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-radio-icon lucide-radio"><path d="M16.247 7.761a6 6 0 0 1 0 8.478"/><path d="M19.075 4.933a10 10 0 0 1 0 14.134"/><path d="M4.925 19.067a10 10 0 0 1 0-14.134"/><path d="M7.753 16.239a6 6 0 0 1 0-8.478"/><circle cx="12" cy="12" r="2"/></svg>, path: '/radio' },
         { name: 'عن رتل', icon: (color) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path d="M12 8h.01" /></svg>, path: '/about' },
     ];
 
@@ -42,7 +44,7 @@ const Navbar = () => {
                 <div className="flex items-center gap-3 group cursor-pointer">
                     <div className="relative w-10 h-10 overflow-hidden rounded-2xl shadow-inner transition-transform group-hover:scale-110 active:scale-95">
                         <div className="absolute inset-0 bg-gradient-to-tr from-blue-600 to-cyan-400 opacity-20 group-hover:opacity-100 transition-opacity" />
-                        <img src="/favicon.png" className="relative z-10 w-full h-full object-cover p-1.5" alt="Logo" />
+                        <img src="/favicon.png" className="relative z-10 w-full h-full object-cover p-1.5 rounded-full" alt="Logo" />
                     </div>
                     <h1 className="text-2xl font-black bg-gradient-to-l from-blue-600 to-indigo-500 bg-clip-text text-transparent dark:from-blue-400 dark:to-cyan-300">
                         رتل

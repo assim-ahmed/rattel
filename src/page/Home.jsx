@@ -1,102 +1,148 @@
-import React, { useState } from 'react';
-import useFetch from '../hook/useFetch';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import useFetch from '../hook/useFetch';
+import useRecitersStore from '../store/useRecitersStore';
+import useRiwayatStore from '../store/useRiwayatStore';
 
 const Home = () => {
-    const { data, loading, error } = useFetch('https://mp3quran.net/api/v3/reciters');
+    const { reciters, setReciters } = useRecitersStore();
+    const { riwayat, setRiwayat } = useRiwayatStore();
+
     const [searchTerm, setSearchTerm] = useState('');
-    const recitersList = data?.reciters || [];
+    const [selectedRewayah, setSelectedRewayah] = useState('');
+    const [favorites, setFavorites] = useState([]);
 
-    const filteredReciters = recitersList.filter(r => r.name.includes(searchTerm));
+    const { data: recData, loading } = useFetch('https://www.mp3quran.net/api/v3/reciters?language=ar');
+    const { data: riwData } = useFetch('https://www.mp3quran.net/api/v3/riwayat?language=ar');
 
-    // مكون هيكل التحميل (Skeleton Card)
-    const SkeletonCard = () => (
-        <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-100 dark:border-slate-800 animate-pulse flex items-center gap-4">
-            <div className="w-12 h-12 shrink-0 rounded-2xl bg-slate-200 dark:bg-slate-800"></div>
-            <div className="flex-1 space-y-3">
-                <div className="h-4 bg-slate-200 dark:bg-slate-800 rounded-full w-3/4"></div>
-                <div className="h-3 bg-slate-200 dark:bg-slate-800 rounded-full w-1/2"></div>
-            </div>
-            <div className="w-5 h-5 bg-slate-100 dark:bg-slate-800 rounded-full"></div>
-        </div>
-    );
+    useEffect(() => {
+        if (recData) setReciters(recData.reciters);
+        if (riwData) setRiwayat(riwData.riwayat);
+        setFavorites(JSON.parse(localStorage.getItem('quran_favorites')) || []);
+    }, [recData, riwData, setReciters, setRiwayat]);
+
+    // --- المنطق المتسلسل للفلترة ---
+
+    // 1. الفلترة بالرواية (المرحلة الأولى)
+    const baseList = selectedRewayah === "" 
+        ? reciters 
+        : reciters.filter((reciter)=>{
+        return reciter.moshaf.some(m => String(m.rewaya_id) === String(selectedRewayah));        });
+
+    // 2. البحث بالاسم (المرحلة الثانية - داخل نتائج الرواية فقط)
+    const filteredReciters = searchTerm.trim() === "" 
+        ? baseList 
+        : baseList.filter(reciter => reciter.name.includes(searchTerm));
+
+
+
+    const toggleFavorite = (e, reciter) => {
+        e.preventDefault(); e.stopPropagation();
+        const isExist = favorites.find(f => f.id === reciter.id);
+        const updated = isExist ? favorites.filter(f => f.id !== reciter.id) : [...favorites, reciter];
+        setFavorites(updated);
+        localStorage.setItem('quran_favorites', JSON.stringify(updated));
+    };
 
     return (
-        <div className="min-h-screen bg-slate-200 dark:bg-slate-800/50 pt-5 pb-12 px-6 transition-colors duration-500 text-right" dir="rtl">
+        <div className="min-h-screen bg-slate-100 dark:bg-slate-950 pt-8 pb-12 px-6 text-right transition-colors" dir="rtl">
             <div className="max-w-7xl mx-auto">
                 
-                {/* رأس الصفحة */}
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-12">
+                {/* أدوات التحكم */}
+                <div className="flex flex-col lg:flex-row justify-between items-center gap-6 mb-12">
                     <div>
-                        <h2 className="text-3xl md:text-4xl font-black text-slate-800 dark:text-white mb-2">
-                            قائمة <span className="text-blue-600 dark:text-blue-400">القراء</span>
-                        </h2>
-                        <p className="text-slate-500 dark:text-slate-400 font-medium">اختر قارئك المفضل للاستماع للمصحف الشريف</p>
+                        <h2 className="text-3xl font-black text-slate-800 dark:text-white">قائمة القراء</h2>
+                        <p className="text-slate-500 text-sm mt-1">
+                            {selectedRewayah !== "" 
+                                ? `تم العثور على ${baseList.length} قارئ بهذه الرواية` 
+                                : "تصفح جميع القراء المتاحين"}
+                        </p>
                     </div>
 
-                    {/* شريط البحث */}
-                    <div className="relative group w-full md:w-80">
-                        <input 
-                            type="text"
-                            placeholder="ابحث عن قارئ..."
-                            className="w-full pr-12 pl-5 py-4 rounded-2xl bg-white dark:bg-slate-900 border-2 border-transparent shadow-lg shadow-blue-500/5 focus:border-blue-500 outline-none transition-all dark:text-white"
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
-                        <svg className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                    <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
+                        {/* Select الروايات */}
+                        <div className="relative">
+                            <select 
+                                className="w-full sm:w-64 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-800 focus:ring-2 ring-blue-500 outline-none cursor-pointer appearance-none shadow-sm"
+                                value={selectedRewayah}
+                                onChange={(e) => {
+                                    
+                                    setSelectedRewayah(e.target.value);
+                                   
+                                    setSearchTerm(''); // تصفير البحث عند تغيير الرواية لنتائج أدق
+                                }}
+                            >
+                                <option value="">كل الروايات</option>
+                                {riwayat.map(rew => (
+                                    <option key={rew.id} value={rew.id}>{rew.name}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* حقل البحث */}
+                        <div className="relative group">
+                            <input 
+                                type="text"
+                                placeholder={selectedRewayah === "" ? "بحث بالاسم..." : "بحث في النتائج المفلترة..."}
+                                className="w-full sm:w-72 pr-12 pl-4 py-3 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 focus:ring-2 ring-blue-500 outline-none text-slate-800 dark:text-white shadow-sm transition-all"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                            <svg className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                        </div>
                     </div>
                 </div>
 
-                {/* شبكة القراء أو الهياكل المؤقتة */}
+                {/* شبكة القراء */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     {loading ? (
-                        // إظهار 12 كارت Skeleton أثناء التحميل
-                        Array.from({ length: 12 }).map((_, index) => (
-                            <SkeletonCard key={index} />
-                        ))
+                        <div className="col-span-full text-center py-10 text-slate-400 italic">جاري تحميل البيانات...</div>
                     ) : (
-                        filteredReciters.map((reciter) => (
-                            <Link
-                                key={reciter.id}
-                                to={`quran?id=${reciter.id}`}>
-                                <div 
-                                    title={reciter.name}
-                                    className="group relative bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-100 dark:border-slate-800 transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/10 hover:-translate-y-2 cursor-pointer flex items-center gap-4"
+                        filteredReciters.map(reciter => {
+                            const isFav = favorites.some(f => f.id === reciter.id);
+                            return (
+                                <Link 
+                                    key={reciter.id} 
+                                    to={`quran?id=${reciter?.id}`}
+                                    className="group relative bg-white dark:bg-slate-900 p-5 rounded-[2rem] border border-slate-100 dark:border-slate-800 hover:shadow-2xl hover:-translate-y-1 transition-all flex items-center gap-4"
                                 >
-                                    <div className="w-12 h-12 shrink-0 rounded-2xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 font-bold group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+                                    {/* أيقونة القارئ */}
+                                    <div className="w-14 h-14 shrink-0 rounded-2xl bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-600 dark:text-blue-400 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                                        <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
                                     </div>
 
-                                    <div className="flex-1 overflow-hidden">
-                                        <h3 className="text-lg font-bold text-slate-700 dark:text-slate-200 truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                                    {/* بيانات القارئ */}
+                                    <div className="flex-1 min-w-0">
+                                        <h3 className="font-bold text-slate-800 dark:text-slate-100 truncate group-hover:text-blue-600 transition-colors">
                                             {reciter.name}
                                         </h3>
-                                        <span className="text-xs text-slate-400 tracking-wider">
-                                            {reciter.moshaf[0]?.name.slice(0, 23)}
-                                        </span>
+                                      
                                     </div>
 
-                                    <div className="text-slate-300 group-hover:text-blue-500 group-hover:translate-x-[-4px] transition-all">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                                    {/* القلب فوق السهم */}
+                                    <div className="flex flex-col items-center gap-3 border-r pr-3 border-slate-100 dark:border-slate-800">
+                                        <button 
+                                            onClick={(e) => toggleFavorite(e, reciter)}
+                                            className={`transition-all duration-300 ${isFav ? 'text-red-500 scale-110' : 'text-slate-300 hover:text-red-400'}`}
+                                        >
+                                            <svg width="18" height="18" fill={isFav ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                                <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+                                            </svg>
+                                        </button>
+                                        <div className="text-slate-300 group-hover:text-blue-500 group-hover:-translate-x-1 transition-all">
+                                            <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
+                                        </div>
                                     </div>
-
-                                    <div className="absolute right-0 top-1/2 -translate-y-1/2 h-8 w-1 bg-blue-600 rounded-l-full scale-y-0 group-hover:scale-y-100 transition-transform duration-300" />
-                                </div>
-                            </Link>
-                        ))
+                                </Link>
+                            );
+                        })
                     )}
                 </div>
 
-                {/* حالة الخطأ */}
-                {error && (
-                    <div className="text-center py-24">
-                        <p className="text-red-500 font-bold">حدث خطأ أثناء تحميل البيانات، يرجى المحاولة لاحقاً.</p>
-                    </div>
-                )}
-
                 {/* حالة عدم وجود نتائج */}
-                {!loading && filteredReciters.length === 0 && !error && (
-                    <div className="text-center py-24">
-                        <p className="text-slate-400 font-bold">لا توجد نتائج مطابقة لبحثك..</p>
+                {!loading && filteredReciters.length === 0 && (
+                    <div className="text-center py-20">
+                        <p className="text-slate-400 text-lg">لا توجد نتائج تطابق اختيارك..</p>
                     </div>
                 )}
             </div>
