@@ -47,6 +47,7 @@ function App() {
           <Route path='/Favorites' element={<Favorites/>} />
           <Route path='/about' element={<About/>} />
           <Route path='/radio' element={<Radio/>} />
+          <Route path="*" element={<Home />} />
         </Routes>
         <AudioPlayer/>
 
