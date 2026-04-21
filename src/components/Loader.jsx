@@ -1,5 +1,5 @@
 import React,{useState,useEffect} from 'react';
-
+import image from '../../public/favicon.png';
 const Loader = ({ onFinished }) => {
   const [progress, setProgress] = useState(0);
   const [isExiting, setIsExiting] = useState(false);
@@ -30,7 +30,7 @@ const Loader = ({ onFinished }) => {
     >
       <div className="w-full max-w-md">
         <div className='flex justify-center items-center'>
-            <img src="public/favicon.png" className='size-70 rounded-full' alt="" />
+            <img src={image} className='size-70 rounded-full' alt="" />
         </div>
         {/* النصوص: تتأثر بالـ Dark Mode عبر كلاسات dark: */}
         <div className="flex justify-between items-end mb-6">
